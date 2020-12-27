@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.androiddevs.mvvmnewsapp.Article
 import com.androiddevs.mvvmnewsapp.NewsResponse
 import com.androiddevs.mvvmnewsapp.repository.NewsRepository
+import com.androiddevs.mvvmnewsapp.util.Constant.Companion.COUNTRY_NAME
 import com.androiddevs.mvvmnewsapp.util.Resource
 
 import kotlinx.coroutines.launch
@@ -15,21 +16,21 @@ class NewsViewModel(
     private val newsRepository: NewsRepository
 ) : ViewModel() {
     val breakingNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
-    private var breakingNewsPage = 1
+    var breakingNewsPage = 1
 
-    var breakingNewsResponse: NewsResponse? = null
+    private var breakingNewsResponse: NewsResponse? = null
 
 
     val searchedNews: MutableLiveData<Resource<NewsResponse>> = MutableLiveData()
-    private var searchedNewsPage = 1
+    var searchedNewsPage = 1
 
-    var searchNewsResponse: NewsResponse? = null
+    private var searchNewsResponse: NewsResponse? = null
 
     init {
-        getBreakingNews("us")
+        getBreakingNews(COUNTRY_NAME)
     }
 
-    private fun getBreakingNews(countryCode: String) = viewModelScope.launch {
+    fun getBreakingNews(countryCode: String) = viewModelScope.launch {
         breakingNews.postValue(Resource.Loading())
 
         val response = newsRepository.getBreakingNews(countryCode, breakingNewsPage)
@@ -49,9 +50,9 @@ class NewsViewModel(
         if (response.isSuccessful) {
             response.body()?.let { resultResponse ->
                 breakingNewsPage++
-                if (breakingNewsResponse == null){
+                if (breakingNewsResponse == null) {
                     breakingNewsResponse = resultResponse
-                }else{
+                } else {
                     val oldArticles = breakingNewsResponse?.articles
                     val newsResponse = resultResponse.articles
                     oldArticles?.addAll(newsResponse)
@@ -67,9 +68,9 @@ class NewsViewModel(
         if (response.isSuccessful) {
             response.body()?.let { resultResponse ->
                 searchedNewsPage++
-                if (searchNewsResponse == null){
+                if (searchNewsResponse == null) {
                     searchNewsResponse = resultResponse
-                }else{
+                } else {
                     val oldArticles = searchNewsResponse?.articles
                     val newsResponse = resultResponse.articles
                     oldArticles?.addAll(newsResponse)
